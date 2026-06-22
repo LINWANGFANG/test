@@ -1,0 +1,63 @@
+en
+conf t
+vlan 10
+name Sales
+exit
+vlan 20
+name Tech
+exit
+
+int f0/1
+sw mo ac
+sw ac vlan 10
+exit
+
+int f0/2
+sw mo ac
+sw ac vlan 10
+exit
+
+int range f0/3-4
+sw mo ac
+sw ac vlan 20
+end
+
+show vlan b
+-------------------------------------------
+
+en
+conf t
+
+# 创建聚合组（组号1-6，PT最多支持6组）
+interface port-channel 1
+exit
+
+# 把物理口加入聚合组
+int range f0/1-2
+channel-group 1 mode active
+end
+
+# 查看聚合状态
+show etherchannel summary
+show etherchannel port-channel
+wr
+
+-----------------------------------------------
+
+en
+conf t
+
+# 第1步：给交换机配管理IP（相当于门牌号）
+int vlan 1
+ip addr 192.168.1.100 255.255.255.0
+no shut
+exit
+
+# 第2步：设置登录密码（进门密码）
+line vty 0 4
+password 123456
+login
+exit
+
+# 第3步：设置特权模式密码（提权密码）
+enable password 654321
